@@ -1,0 +1,4 @@
+
+(1) activate ven
+    .\Scripts\activate.ps1
+
