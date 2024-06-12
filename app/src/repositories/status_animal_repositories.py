@@ -56,9 +56,16 @@ def delete_status_animal(db: Session, status_animal_id: int):
     db.commit()
     return {"message": "StatusAnimal deleted successfully"}
 
+def formatar_valor(valor):
+    tolerancia = 1e-10  # Define uma tolerância para considerar valores muito próximos de zero como zero
+    if abs(valor) < tolerancia:
+        return 0
+    else:
+        return valor
 
 
 def update_status_animal(db: Session, id_status: int, id_usuario: int):
+
     # Buscar o registro de ConsumoAnimal inserido recentemente
     consumo_animal = db.query(models.ConsumoAnimal).filter(
         models.ConsumoAnimal.id_status_alimento == id_status,
@@ -91,10 +98,12 @@ def update_status_animal(db: Session, id_status: int, id_usuario: int):
         print(f"insert_into_consumo_animal: {status_animal}")
     
     # Atualizar os valores de StatusAnimal com os valores de StatusAlimento, respeitando o limite de 10
-    status_animal.alimentacao_saudavel = min(status_animal.alimentacao_saudavel + status_alimento.alimentacao_saudavel, 10.0)
-    status_animal.energia = min(status_animal.energia + status_alimento.energia, 10.0)
-    status_animal.forca = min(status_animal.forca + status_alimento.forca, 10.0)
-    status_animal.felicidade = min(status_animal.felicidade + status_alimento.felicidade, 10.0)
+
+    status_animal.alimentacao_saudavel = formatar_valor(min(status_animal.alimentacao_saudavel + status_alimento.alimentacao_saudavel, 10.0))
+    status_animal.energia = formatar_valor(min(status_animal.energia + status_alimento.energia, 10.0))
+    status_animal.forca = formatar_valor(min(status_animal.forca + status_alimento.forca, 10.0))
+    status_animal.felicidade = formatar_valor(min(status_animal.felicidade + status_alimento.felicidade, 10.0))
+
     
     # Commitar as mudanças no banco de dados
     db.commit()
@@ -110,10 +119,12 @@ def update_status_animal_attributes(db: Session):
     # Iterar sobre cada registro e atualizar os valores
     for status_animal in status_animais:
         # Atualizar os valores de acordo com a lógica desejada
-        status_animal.alimentacao_saudavel = max(status_animal.alimentacao_saudavel + (5 if status_animal.alimentacao_saudavel < 0 else -5), 10)
-        status_animal.energia = min(status_animal.energia + (0.5 if status_animal.energia < 0 else -0.5), 10.0)
-        status_animal.forca = min(status_animal.forca + (0.5 if status_animal.forca < 0 else -0.5), 10.0)
-        status_animal.felicidade = min(status_animal.felicidade + (0.5 if status_animal.felicidade < 0 else -0.5), 10.0)
+        status_animal.alimentacao_saudavel = formatar_valor(round(min(status_animal.alimentacao_saudavel + (0.1 if status_animal.alimentacao_saudavel < 0 else -0.1), 10.0), 2))
+
+        status_animal.energia = formatar_valor(round(min(status_animal.energia + (0.1 if status_animal.energia < 0 else -0.1), 10.0), 2))
+
+        status_animal.forca = formatar_valor(round(min(status_animal.forca + (0.1 if status_animal.forca < 0 else -0.1), 10.0), 2))
+        status_animal.felicidade = formatar_valor(round(min(status_animal.felicidade + (0.1 if status_animal.felicidade < 0 else -0.1), 10.0), 2))
 
     print("tarefa agendada atualização status")
     # Confirmar as alterações no banco de dados
@@ -127,7 +138,7 @@ def update_status_animal_attributes(db: Session):
 # Agendar a função de atualização
 def agendar_atualizacao(db: Session = Depends(get_db)):
     # Agendar a função para ser executada a cada 1 minuto
-    schedule.every(1).minutes.do(update_status_animal_attributes, db)
+    schedule.every(30).minutes.do(update_status_animal_attributes, db)
 
 # Função de background para executar as tarefas agendadas
 def executar_tarefas_agendadas(db:Session = Depends(get_db)):

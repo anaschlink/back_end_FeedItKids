@@ -56,7 +56,7 @@ async def process_image(base64_image):
 6: Doces, Chocolate, Balas, Guloseimas
 7: Salgados de Padaria/Festa
 8: Refrigerante, Bebidas Gaseificadas, Sucos de Caixinha
-9: Suco Natural de Fruta
+9: Suco Natural de Fruta, Água
 10: Embutidos, Presunto, Peito de Peru, Mortadela
 
 Se for fast-food, classifique como Guloseimas.

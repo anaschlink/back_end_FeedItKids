@@ -22,13 +22,6 @@ def get_status(id_status: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Status not found")
     return status
 
-@router.get("/status/{grupo_alimento}", response_model=int)
-def get_status_by_group(grupo_alimento: str, db: Session = Depends(get_db)):
-    id_status = crud.get_status_by_grupo_alimento(db, grupo_alimento)
-    if id_status is None:
-        raise HTTPException(status_code=404, detail="Status not found")
-    return id_status
-
 @router.get("/status/{grupo_alimento}", response_model=schemas.StatusResponse)
 def get_status_by_group(grupo_alimento: str, db: Session = Depends(get_db)):
     status_alimento = crud.get_status_by_grupo_alimento(db, grupo_alimento)
