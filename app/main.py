@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI
-import IA
+from mangum import Mangum
+import app.IA as IA
 from src.database.database import SessionLocal, engine, Base, get_db
 from src.models.status_alimento_model import StatusAlimento
 from src.models.Animal_model import ConsumoAnimal, StatusAnimal
@@ -14,6 +15,7 @@ import time
 from src.repositories.status_animal_repositories import  update_status_animal_attributes  # Importe sua função de atualização
 
 app = FastAPI()
+handler = Mangum(app)
 
 origins = [
     "http://localhost:8081",
